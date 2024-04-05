@@ -122,6 +122,14 @@
   home-manager.users.lilly = {
     home.stateVersion = "23.11";
 
+    gtk = {
+      enable = true;
+      theme = {
+        name = "Breeze-Dark";
+        package = pkgs.libsForQt5.breeze-gtk;
+      };
+    };
+
     programs = {
       zsh = {
         enable = true;
@@ -278,6 +286,7 @@
       enableSSHSupport = true;
       # pinentryFlavour = "gtk2";
     };
+    dconf.enable = true;
   };
 
 

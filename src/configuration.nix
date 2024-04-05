@@ -269,6 +269,8 @@
       wget
       less
       mpv
+      vlc
+      pipenv
     ];
     pathsToLink = [ "/share/zsh" ];
   };

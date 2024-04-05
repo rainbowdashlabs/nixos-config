@@ -1,0 +1,28 @@
+default partial alphanumeric_keys
+xkb_symbols "basic" {
+
+    // Describes the differences between a very simple en_US
+    // keyboard and a very simple U.K. keyboard layout defined by
+    // the SVR4 European Language Supplement and sometimes also
+    // known as the IBM 166 layout.
+
+    include "latin"
+
+    name[Group1]="English (UK)";
+
+    key <AE02>  { [         2,   quotedbl,  twosuperior,    oneeighth ] };
+
+    key <AC11>  { [apostrophe,         at, dead_circumflex, dead_caron] };
+    key <TLDE>  { [     grave,    notsign,          bar,          bar ] };
+
+    key <BKSL>  { [numbersign, asciitilde,   dead_grave,   dead_breve ] };
+    key <LSGT>  { [ backslash,        bar,          bar,    brokenbar ] };
+
+    // German backport
+    key <AD06>  { [         z,          Z,   leftarrow,          yen ] };
+    key <AB01>  { [         y,          Y,   guillemotright,    U203A       ] };
+    key <AD03>  { [         e,          E,   EuroSign,     EuroSign ] };
+    key <AE04>  { [         4,     dollar,   onequarter,     currency ] };
+
+    include "level3(ralt_switch)"
+};

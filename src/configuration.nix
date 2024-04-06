@@ -4,11 +4,15 @@
 
 { config, pkgs, ... }:
 
+let
+  unstablePkgs = import <nixos-unstable> { config.allowUnfree = true; };
+in
 {
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       <home-manager/nixos>
+      ./configs/home-manager.nix
     ];
 
   # Bootloader.
@@ -119,143 +123,11 @@
     ];
   };
 
-  home-manager.users.lilly = {
-    home.stateVersion = "23.11";
-
-    gtk = {
-      enable = true;
-      theme = {
-        name = "Breeze-Dark";
-        package = pkgs.libsForQt5.breeze-gtk;
-      };
-    };
-
-    programs = {
-      zsh = {
-        enable = true;
-
-        antidote = {
-          enable = true;
-          plugins = [
-            "zsh-users/zsh-autosuggestions"
-            "zsh-users/zsh-completions"
-          ];
-          useFriendlyNames = true;
-        };
-
-        autocd = true;
-
-        # autosuggestion.enable = true;
-
-        history = {
-          expireDuplicatesFirst = true;
-        };
-
-        oh-my-zsh = {
-          enable = true;
-          plugins = [
-            "zsh-autosuggestions"
-            "zsh-completions"
-            "gitfast"
-            "git-extras"
-            "gradle"
-            "docker"
-            "mvn"
-            "python"
-            "screen"
-            "sublime"
-            "sudo"
-            "sdk"
-            "pipenv"
-            "rust"
-            "docker-compose"
-          ];
-          theme = "robbyrussell";
-        };
-        initExtra = "export GPG_TTY=$(tty)\ngpg-connect-agent updatestartuptts /bye >/dev/null";
-      };
-
-      git = {
-        enable = true;
-
-        signing = {
-          key = null; # Let gpg decide
-          signByDefault = true;
-        };
-
-        userName = "Lilly";
-        userEmail = "46890129+RainbowDashLabs@users.noreply.github.com";
-
-        extraConfig = {
-          core = {
-            editor = "nano";
-            autocrlf = "input";
-          };
-
-          checkout = {
-            defaultRemote = "true";
-          };
-
-          pull = {
-            rebase = true;
-          };
-
-          push = {
-            default = "current";
-            autosetupremote = true;
-          };
-
-          init = {
-            defaultbranch = "main";
-          };
-        };
-      };
-
-#      gradle = {
-#        enable = true;
-#      };
-
-      htop = {
-        enable = true;
-        settings = {
-
-        };
-      };
-
-      java = {
-        enable = true;
-      };
-
-      pyenv = {
-        enable = true;
-        enableZshIntegration = true;
-      };
-    };
-
-    services = {
-      flameshot = {
-        enable = true;
-        settings = {
-          General = {
-            savePath="~/Pictures/flameshot";
-          };
-        };
-      };
-      nextcloud-client = {
-        enable = true;
-        startInBackground = true;
-      };
-    };
-  };
-
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
   environment = {
-    systemPackages = with pkgs; [
-      jetbrains.idea-ultimate
-      jetbrains.datagrip
-      jetbrains.pycharm-professional
+    systemPackages = (with pkgs; [
       discord
       discord-canary
       libsForQt5.yakuake
@@ -271,13 +143,30 @@
       mpv
       vlc
       pipenv
-    ];
+    ] ++
+    (with unstablePkgs; [
+      jetbrains.idea-ultimate
+      jetbrains.datagrip
+      jetbrains.pycharm-professional
+    ]) );
     pathsToLink = [ "/share/zsh" ];
   };
 
   programs = {
     _1password-gui.enable = true;
-    zsh.enable = true;
+    zsh = {
+      enable = true;
+#      ohMyZsh.plugins = [
+#        {
+#          name = "zsh-autosuggestions";
+#          src = pkgs.zsh-autosuggestions;
+#        }
+#        {
+#          name = "zsh-completions";
+#          src = pkgs.zsh-completions;
+#        }
+#      ];
+    };
     kdeconnect.enable = true;
     git.enable = true;
     # Some programs need SUID wrappers, can be configured further or are

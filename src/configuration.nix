@@ -127,7 +127,8 @@ in
   nixpkgs.config.allowUnfree = true;
 
   environment = {
-    systemPackages = (with pkgs; [
+    systemPackages =
+    (with pkgs; [
       discord
       discord-canary
       libsForQt5.yakuake
@@ -143,12 +144,12 @@ in
       mpv
       vlc
       pipenv
-    ] ++
+    ]) ++
     (with unstablePkgs; [
       jetbrains.idea-ultimate
       jetbrains.datagrip
       jetbrains.pycharm-professional
-    ]) );
+    ]);
     pathsToLink = [ "/share/zsh" ];
   };
 

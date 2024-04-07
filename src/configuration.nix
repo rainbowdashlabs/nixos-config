@@ -23,25 +23,14 @@ in
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  networking.hostName = "liara"; # Define your hostname.
+  networking.hostName = "liara";
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
-  # Enable networking
   networking.networkmanager.enable = true;
 
-  # Configure console keymap
   console.keyMap = "de";
 
-
   security.rtkit.enable = true;
-
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
-
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -49,24 +38,29 @@ in
   environment = {
     systemPackages =
     (with pkgs; [
+      # basics
+      neofetch
+      libsForQt5.yakuake # terminal
+      # cli tools
       bash
+      less
+      bat
+      tldr
+      wget
+      # development
+      pipenv
       kate
+      docker-compose
+      # communication
       thunderbird
       discord
       discord-canary
-      libsForQt5.yakuake
-      bat
-      spotify
       slack
-      docker-compose
-      tldr
+      # media
+      spotify
       flameshot
-      neofetch
-      wget
-      less
       mpv
       vlc
-      pipenv
     ]) ++
     (with unstablePkgs; [
       jetbrains.idea-ultimate

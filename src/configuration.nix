@@ -13,6 +13,9 @@ in
       ./hardware-configuration.nix
       <home-manager/nixos>
       ./configs/home-manager.nix
+      ./modules
+      ./programs
+      ./users
     ];
 
   # Bootloader.
@@ -28,15 +31,6 @@ in
 
   # Enable networking
   networking.networkmanager.enable = true;
-  virtualisation = {
-    docker = {
-      enable = true;
-      rootless = {
-        enable = true;
-        setSocketVariable = true;
-      };
-    };
-  };
 
   # Set your time zone.
   time.timeZone = "Europe/Berlin";
@@ -90,38 +84,11 @@ in
   # Enable CUPS to print documents.
   services.printing.enable = true;
 
-  # Enable sound with pipewire.
-  sound.enable = true;
-  hardware.pulseaudio.enable = false;
   security.rtkit.enable = true;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-    # If you want to use JACK applications, uncomment this
-    #jack.enable = true;
-
-    # use the example session manager (no others are packaged yet so this is enabled by default,
-    # no need to redefine it in your config for now)
-    #media-session.enable = true;
-  };
 
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.lilly = {
-    isNormalUser = true;
-    shell = pkgs.zsh;
-    description = "Lilly";
-    extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [
-      firefox
-      kate
-      thunderbird
-    ];
-  };
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -129,6 +96,8 @@ in
   environment = {
     systemPackages =
     (with pkgs; [
+      kate
+      thunderbird
       discord
       discord-canary
       libsForQt5.yakuake
@@ -152,35 +121,6 @@ in
     ]);
     pathsToLink = [ "/share/zsh" ];
   };
-
-  programs = {
-    _1password-gui.enable = true;
-    zsh = {
-      enable = true;
-#      ohMyZsh.plugins = [
-#        {
-#          name = "zsh-autosuggestions";
-#          src = pkgs.zsh-autosuggestions;
-#        }
-#        {
-#          name = "zsh-completions";
-#          src = pkgs.zsh-completions;
-#        }
-#      ];
-    };
-    kdeconnect.enable = true;
-    git.enable = true;
-    # Some programs need SUID wrappers, can be configured further or are
-    # started in user sessions.
-    # mtr.enable = true;
-    gnupg.agent = {
-      enable = true;
-      enableSSHSupport = true;
-      # pinentryFlavour = "gtk2";
-    };
-    dconf.enable = true;
-  };
-
 
   # List services that you want to enable:
 

@@ -1,3 +1,2 @@
-#! /bin/bash
-cp -r ./src/* /etc/nixos/
-nixos-rebuild switch
+#!/bin/sh
+nixos-rebuild switch -I nixos-config=$(pwd)/src/configuration.nix

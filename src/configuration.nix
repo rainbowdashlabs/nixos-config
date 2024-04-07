@@ -96,6 +96,7 @@ in
   environment = {
     systemPackages =
     (with pkgs; [
+      bash
       kate
       thunderbird
       discord

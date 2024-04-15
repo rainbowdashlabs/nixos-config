@@ -47,6 +47,10 @@ in
       # bootloading
       refind
       efibootmgr
+      # java
+      (gradle.overrideAttrs {
+        javaToolchains = with pkgs; [ jdk11 jdk17 jdk21 ];
+      })
     ]) ++
     (with unstablePkgs; [
       jetbrains.idea-ultimate

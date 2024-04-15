@@ -1,10 +1,8 @@
 { config, ... }:
 
 {
-  imports =
-    [
-      ./lilly.nix
-    ];
+
+  console.keyMap = "de";
 
   # Set your time zone.
   time.timeZone = "Europe/Berlin";

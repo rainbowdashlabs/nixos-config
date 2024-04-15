@@ -3,11 +3,11 @@
 {
   imports =
     [ # Include the results of the hosts.hardware scan.
-      ./hardware/liara.nix
+      ./hardware/shepard.nix
       ./../modules
     ];
 
-  networking.hostName = "liara";
+  networking.hostName = "shepard";
 
   system.stateVersion = "23.11";
 }

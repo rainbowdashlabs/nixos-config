@@ -43,6 +43,7 @@ in
       vulkan-tools
       gpu-viewer
       pciutils
+      toybox
       # bootloading
       refind
       efibootmgr

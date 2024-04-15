@@ -41,6 +41,9 @@ in
       vulkan-tools
       gpu-viewer
       pciutils
+      # bootloading
+      refind
+      efibootmgr
     ]) ++
     (with unstablePkgs; [
       jetbrains.idea-ultimate

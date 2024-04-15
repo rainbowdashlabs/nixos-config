@@ -21,6 +21,7 @@
         uk-swapped = {
           description = "Custom UK layout with z and y swapped";
           languages = ["eng"];
+          # This is relative to the config after copying
           symbolsFile = /etc/nixos/assets/gb;
         };
       };

@@ -1,11 +1,14 @@
-{ ... }:
+{ config, pkgs, ... }:
 
 {
   imports =
     [
-      ./bluetooth.nix
-      ./audio.nix
-      ./docker.nix
+      ./home_manager
+      ./features
+      ./programs
+      ./users
+      ./services
+      ./environment
+      ./boot
     ];
-
 }

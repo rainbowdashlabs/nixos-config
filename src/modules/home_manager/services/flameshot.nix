@@ -5,7 +5,7 @@
     enable = true;
     settings = {
       General = {
-        savePath="~/Pictures/flameshot";
+        savePath="~/Pictures/flameshot/";
       };
     };
   };

@@ -36,6 +36,8 @@ in
       mpv
       vlc
       chromium
+      # games
+      prismlauncher
       # tooling
       clinfo
       vulkan-tools

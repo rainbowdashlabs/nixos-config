@@ -14,9 +14,9 @@
       };
     };
 
-    java = {
-      enable = true;
-    };
+#    java = {
+#      enable = true;
+#    };
 
     pyenv = {
       enable = true;

@@ -15,6 +15,7 @@ in
       # basics
       neofetch
       libsForQt5.yakuake # terminal
+      libsForQt5.kcalc
       # cli tools
       bash
       less
@@ -24,6 +25,7 @@ in
       # development
       pipenv
       kate
+      typora
       docker-compose
       # communication
       thunderbird
@@ -36,6 +38,9 @@ in
       mpv
       vlc
       chromium
+      onlyoffice-bin
+      nextcloud-client
+      libsForQt5.gwenview
       # games
       prismlauncher
       # tooling
@@ -51,6 +56,7 @@ in
       (gradle.overrideAttrs {
         javaToolchains = with pkgs; [ jdk11 jdk17 jdk21 ];
       })
+      whatsapp-for-linux
     ]) ++
     (with unstablePkgs; [
       jetbrains.idea-ultimate

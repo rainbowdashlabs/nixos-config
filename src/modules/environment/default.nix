@@ -27,6 +27,7 @@ in
       kate
       typora
       docker-compose
+      # virtualbox
       # communication
       thunderbird
       discord

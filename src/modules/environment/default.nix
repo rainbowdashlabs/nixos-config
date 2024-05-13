@@ -23,11 +23,16 @@ in
       tldr
       wget
       # development
-      pipenv
       kate
       typora
       docker-compose
-      # virtualbox
+      # python
+      pipenv
+      # python39 # error for some reason idc
+      python310
+      python311
+      python312
+      python313
       # communication
       thunderbird
       discord

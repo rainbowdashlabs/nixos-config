@@ -13,6 +13,7 @@ in
     systemPackages =
     (with pkgs; [
       # basics
+      anydesk
       neofetch
       libsForQt5.yakuake # terminal
       libsForQt5.kcalc
@@ -26,13 +27,18 @@ in
       kate
       typora
       docker-compose
+      libgcc
       # python
       pipenv
-      # python39 # error for some reason idc
-      python310
-      python311
-      python312
-      python313
+      # Nix really doesnt like multiple python versions. This produces just a big clusterfuck
+#      # python39 # error for some reason idc
+#      python310
+#      python310Packages.cython
+#      python311
+#      python311Packages.cython
+#      python311Packages
+#      python312
+#      python313
       # communication
       thunderbird
       discord

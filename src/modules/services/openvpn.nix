@@ -4,7 +4,7 @@
   services.openvpn = {
     servers = {
       work = {
-        config = "config ~/modules/assets/openvpn/work.ovpn";
+        config = "config /etc/nixos/assets/openvpn/work.ovpn";
       };
     };
   };

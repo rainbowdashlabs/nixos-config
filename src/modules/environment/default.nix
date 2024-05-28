@@ -30,6 +30,7 @@ in
       libgcc
       # python
       pipenv
+      poetry
       # Nix really doesnt like multiple python versions. This produces just a big clusterfuck
 #      # python39 # error for some reason idc
 #      python310
@@ -45,6 +46,7 @@ in
       discord-canary
       slack
       # media
+      obs-studio
       spotify
       flameshot
       mpv

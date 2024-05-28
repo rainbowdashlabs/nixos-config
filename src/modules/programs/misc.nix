@@ -2,7 +2,10 @@
 
 {
   programs = {
-    _1password-gui.enable = true;
+    _1password-gui = {
+      enable = true;
+      polkitPolicyOwners = ["lilly"];
+    };
     zsh = {
       enable = true;
 #      ohMyZsh.plugins = [

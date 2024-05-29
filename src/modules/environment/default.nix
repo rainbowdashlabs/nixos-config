@@ -13,7 +13,6 @@ in
     systemPackages =
     (with pkgs; [
       # basics
-      anydesk
       neofetch
       libsForQt5.yakuake # terminal
       libsForQt5.kcalc

@@ -27,6 +27,7 @@ in
       typora
       docker-compose
       libgcc
+      wireguard-tools
       # python
       pipenv
       poetry

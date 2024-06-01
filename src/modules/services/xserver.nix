@@ -1,18 +1,26 @@
 { config, ... }:
 
 {
+
+  services.displayManager = {
+    sddm.enable = true;
+  };
+
+  services.desktopManager = {
+    plasma6.enable = true;
+  };
   # Configure keymap in X11
   services.xserver = {
     # Enable the X11 windowing system.
     enable = true;
 
-    displayManager = {
-      sddm.enable = true;
-    };
+#    displayManager = {
+#      sddm.enable = true;
+#    };
     # Enable the KDE Plasma Desktop Environment.
-    desktopManager = {
-      plasma5.enable = true;
-    };
+#    desktopManager = {
+#      plasma5.enable = true;
+#    };
 
     xkb = {
       layout = "de,uk-swapped";

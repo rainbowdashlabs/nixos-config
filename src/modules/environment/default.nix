@@ -23,7 +23,7 @@ in
       tldr
       wget
       # development
-      kate
+#      kate
       typora
       docker-compose
       libgcc
@@ -54,7 +54,7 @@ in
       chromium
       onlyoffice-bin
       nextcloud-client
-      libsForQt5.gwenview
+      #libsForQt5.gwenview
       # games
       prismlauncher
       # tooling
@@ -62,7 +62,8 @@ in
       vulkan-tools
       gpu-viewer
       pciutils
-      toybox
+      coreutils-full
+      gparted
       # bootloading
       refind
       efibootmgr

@@ -23,7 +23,7 @@ in
       tldr
       wget
       # development
-#      kate
+      kate
       typora
       docker-compose
       libgcc
@@ -52,9 +52,11 @@ in
       mpv
       vlc
       chromium
+      libsForQt5.gwenview
+      #libreoffice
       onlyoffice-bin
       nextcloud-client
-      #libsForQt5.gwenview
+      libsForQt5.gwenview
       # games
       prismlauncher
       # tooling
@@ -72,6 +74,7 @@ in
         javaToolchains = with pkgs; [ jdk11 jdk17 jdk21 ];
       })
       whatsapp-for-linux
+      anydesk
     ]) ++
     (with unstablePkgs; [
       jetbrains.idea-ultimate

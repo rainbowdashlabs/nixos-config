@@ -30,5 +30,11 @@
       # pinentryFlavour = "gtk2";
     };
     dconf.enable = true;
+    nix-ld = {
+      enable = true;
+      libraries = with pkgs; [
+          R
+      ];
+    };
   };
 }

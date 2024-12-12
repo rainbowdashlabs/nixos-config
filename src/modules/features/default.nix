@@ -9,6 +9,7 @@
       ./virt_manager.nix
       ./security.nix
       ./networking.nix
+      ./logitech.nix
     ];
 
 }

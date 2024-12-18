@@ -1,10 +1,13 @@
 { config, pkgs, ... }:
-
+let
+  unstablePkgs = import <nixos-unstable> { config.allowUnfree = true; };
+in
 {
   programs = {
     _1password-gui = {
       enable = true;
       polkitPolicyOwners = ["lilly"];
+      package = unstablePkgs._1password-gui;
     };
     zsh = {
       enable = true;

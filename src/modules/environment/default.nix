@@ -91,6 +91,7 @@ in
       jetbrains.webstorm
       jetbrains.pycharm-professional
       discord
+      jetbrains.webstorm
     ]);
     pathsToLink = [ "/share/zsh" ];
 

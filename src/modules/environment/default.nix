@@ -30,8 +30,6 @@ in
       tldr
       wget
       # development
-      kate
-#      kate
       gnumake
       typora
       docker-compose
@@ -40,15 +38,6 @@ in
       wgnord
       pipenv
       poetry
-      # Nix really doesnt like multiple python versions. This produces just a big clusterfuck
-#      # python39 # error for some reason idc
-#      python310
-#      python310Packages.cython
-#      python311
-#      python311Packages.cython
-#      python311Packages
-#      python312
-#      python313
       # communication
       thunderbird
       discord-ptb
@@ -61,11 +50,9 @@ in
       mpv
       vlc
       chromium
-      libsForQt5.gwenview
       #libreoffice
       onlyoffice-bin
       nextcloud-client
-      libsForQt5.gwenview
       # games
       prismlauncher
       # tooling

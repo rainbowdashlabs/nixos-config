@@ -5,7 +5,7 @@
     [
       ./firefox.nix
       ./misc.nix
-      ./chromium.nix
+      # ./chromium.nix # installed via system package
     ];
 
 }

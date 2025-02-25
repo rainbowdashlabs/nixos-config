@@ -51,7 +51,6 @@ in
       flameshot
       mpv
       vlc
-      chromium
       #libreoffice
       onlyoffice-bin
       nextcloud-client
@@ -71,6 +70,17 @@ in
       (gradle.overrideAttrs {
         javaToolchains = with pkgs; [ jdk11 jdk17 jdk21 ];
       })
+      (chromium.override {
+        enableWideVine = true;
+        commandLineArgs = [
+            "--enable-features=AcceleratedVideoEncoder,VaapiOnNvidiaGPUs,VaapiIgnoreDriverChecks,Vulkan,DefaultANGLEVulkan,VulkanFromANGLE"
+            "--enable-features=VaapiIgnoreDriverChecks,VaapiVideoDecoder,PlatformHEVCDecoderSupport"
+            "--enable-features=UseMultiPlaneFormatForHardwareVideo"
+            "--enable-features=AcceleratedVideoEncoder"
+            "--ignore-gpu-blocklist"
+            "--enable-zero-copy"
+        ];
+       }) # enables drm protected content
       whatsapp-for-linux
       anydesk
     ]) ++

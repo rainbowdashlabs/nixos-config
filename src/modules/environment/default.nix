@@ -21,8 +21,10 @@ in
     (with pkgs; [
       # basics
       neofetch
-      libsForQt5.yakuake # terminal
-      libsForQt5.kcalc
+      uwuify
+      fastfetch
+      kdePackages.yakuake # terminal
+      kdePackages.kcalc
       # cli tools
       bash
       less

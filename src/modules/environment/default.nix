@@ -56,6 +56,9 @@ in
       nextcloud-client
       # games
       prismlauncher
+      lutris
+      steam
+      protonup-qt
       # tooling
       clinfo
       vulkan-tools

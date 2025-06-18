@@ -40,6 +40,7 @@ in
       wgnord
       pipenv
       poetry
+      git-lfs
       # communication
       thunderbird
       discord-ptb

@@ -1,26 +1,35 @@
 { config, pkgs, ... }:
 let
-  unstablePkgs = import <nixos-unstable> { config.allowUnfree = true; };
+  unstablePkgs = import <nixos-unstable> { config.allowUnfree = true; config.cudaSupport = true; };
 in
 {
   programs = {
+    obs-studio = {
+      enable = true;
+      package = unstablePkgs.obs-studio;
+
+      plugins = with unstablePkgs.obs-studio-plugins; [
+        obs-aitum-multistream
+      ];
+    };
+
     _1password-gui = {
       enable = true;
-      polkitPolicyOwners = ["lilly"];
+      polkitPolicyOwners = [ "lilly" ];
       package = unstablePkgs._1password-gui;
     };
     zsh = {
       enable = true;
-#      ohMyZsh.plugins = [
-#        {
-#          name = "zsh-autosuggestions";
-#          src = pkgs.zsh-autosuggestions;
-#        }
-#        {
-#          name = "zsh-completions";
-#          src = pkgs.zsh-completions;
-#        }
-#      ];
+      #      ohMyZsh.plugins = [
+      #        {
+      #          name = "zsh-autosuggestions";
+      #          src = pkgs.zsh-autosuggestions;
+      #        }
+      #        {
+      #          name = "zsh-completions";
+      #          src = pkgs.zsh-completions;
+      #        }
+      #      ];
     };
     kdeconnect.enable = true;
     git.enable = true;
@@ -36,7 +45,7 @@ in
     nix-ld = {
       enable = true;
       libraries = with pkgs; [
-          R
+        R
       ];
     };
   };

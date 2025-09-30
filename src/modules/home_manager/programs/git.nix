@@ -9,7 +9,7 @@
       signByDefault = true;
     };
 
-    userName = "Lilly";
+    userName = "Nora";
     userEmail = "46890129+RainbowDashLabs@users.noreply.github.com";
 
     extraConfig = {

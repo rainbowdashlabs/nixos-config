@@ -4,7 +4,7 @@ let
   unstablePkgs = import <nixos-unstable> { config.allowUnfree = true; };
 in
 {
-  imports = [];
+  imports = [ ];
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -18,84 +18,92 @@ in
     };
 
     systemPackages =
-    (with pkgs; [
-      # basics
-      neofetch
-      uwuify
-      fastfetch
-      kdePackages.yakuake # terminal
-      kdePackages.kcalc
-      # cli tools
-      bash
-      less
-      bat
-      tldr
-      wget
-      # development
-      gnumake
-      typora
-      docker-compose
-      libgcc
-      wireguard-tools
-      wgnord
-      pipenv
-      poetry
-      git-lfs
-      # communication
-      thunderbird
-      discord-ptb
-      slack
-      # media
-      obs-studio
-      spotify
-      youtube-music
-      flameshot
-      mpv
-      vlc
-      #libreoffice
-      onlyoffice-bin
-      nextcloud-client
-      # games
-      prismlauncher
-      lutris
-      steam
-      protonup-qt
-      # tooling
-      clinfo
-      vulkan-tools
-      gpu-viewer
-      pciutils
-      coreutils-full
-      gparted
-      # bootloading
-      refind
-      efibootmgr
-      # java
-      (gradle.overrideAttrs {
-        javaToolchains = with pkgs; [ jdk11 jdk17 jdk21 ];
-      })
-      (chromium.override {
-        enableWideVine = true;
-        commandLineArgs = [
+      (with pkgs; [
+        # basics
+        neofetch
+        uwuify
+        fastfetch
+        kdePackages.yakuake # terminal
+        kdePackages.kcalc
+        # cli tools
+        bash
+        less
+        bat
+        tldr
+        wget
+        # development
+        gnumake
+        typora
+        docker-compose
+        libgcc
+        wireguard-tools
+        wgnord
+        pipenv
+        poetry
+        git-lfs
+        jujutsu
+        # communication
+        thunderbird
+        discord-ptb
+        element-desktop
+        slack
+        signal-desktop
+        # media
+        spotify
+        youtube-music
+        flameshot
+        mpv
+        vlc
+        blender
+        #libreoffice
+        onlyoffice-bin
+        nextcloud-client
+        # games
+        prismlauncher
+        lutris
+        steam
+        protonup-qt
+        # tooling
+        clinfo
+        vulkan-tools
+        gpu-viewer
+        pciutils
+        coreutils-full
+        gparted
+        # bootloading
+        refind
+        efibootmgr
+        # java
+        (gradle.overrideAttrs {
+          javaToolchains = with pkgs; [ jdk11 jdk17 jdk21 ];
+        })
+        (chromium.override {
+          enableWideVine = true;
+          commandLineArgs = [
             "--enable-features=AcceleratedVideoEncoder,VaapiOnNvidiaGPUs,VaapiIgnoreDriverChecks,Vulkan,DefaultANGLEVulkan,VulkanFromANGLE"
             "--enable-features=VaapiIgnoreDriverChecks,VaapiVideoDecoder,PlatformHEVCDecoderSupport"
             "--enable-features=UseMultiPlaneFormatForHardwareVideo"
             "--enable-features=AcceleratedVideoEncoder"
             "--ignore-gpu-blocklist"
             "--enable-zero-copy"
-        ];
-       }) # enables drm protected content
-      whatsapp-for-linux
-      anydesk
-    ]) ++
-    (with unstablePkgs; [
-      jetbrains.idea-ultimate
-      jetbrains.datagrip
-      jetbrains.webstorm
-      jetbrains.pycharm-professional
-      discord
-      jetbrains.webstorm
-    ]);
+          ];
+        }) # enables drm protected content
+        whatsapp-for-linux
+        anydesk
+      ]) ++
+      (with unstablePkgs; [
+        jetbrains.idea-ultimate
+        jetbrains.datagrip
+        jetbrains.webstorm
+        jetbrains.pycharm-professional
+        discord
+        jetbrains.webstorm
+        # emulation
+        wineWowPackages.stable
+        winetricks
+        wineWowPackages.waylandFull
+        corefonts
+      ]);
     pathsToLink = [ "/share/zsh" ];
 
 

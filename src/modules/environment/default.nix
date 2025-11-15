@@ -42,6 +42,7 @@ in
         poetry
         git-lfs
         jujutsu
+        gh
         # communication
         thunderbird
         discord-ptb

@@ -3,6 +3,6 @@
 {
   imports =
     [
-      ./lilly.nix
+      ./user.nix
     ];
 }

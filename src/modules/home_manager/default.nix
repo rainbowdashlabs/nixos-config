@@ -10,7 +10,7 @@
     useUserPackages = true;
     useGlobalPkgs = true;
 
-    users.lilly = {
+    users.nora = {
       imports = [
         ./base
         ./programs

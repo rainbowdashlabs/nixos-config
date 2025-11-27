@@ -93,12 +93,11 @@ in
         anydesk
       ]) ++
       (with unstablePkgs; [
-        jetbrains.idea-ultimate
-        jetbrains.datagrip
-        jetbrains.webstorm
-        jetbrains.pycharm-professional
+        (jetbrains.idea-ultimate.override { vmopts = "-Dawt.toolkit.name=WLToolkit";})
+        (jetbrains.datagrip.override { vmopts = "-Dawt.toolkit.name=WLToolkit";})
+        (jetbrains.webstorm.override { vmopts = "-Dawt.toolkit.name=WLToolkit";})
+        (jetbrains.pycharm-professional.override { vmopts = "-Dawt.toolkit.name=WLToolkit";})
         discord
-        jetbrains.webstorm
         # emulation
         wineWowPackages.stable
         winetricks

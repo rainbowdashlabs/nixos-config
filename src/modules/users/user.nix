@@ -10,7 +10,7 @@
       initialPassword = "passy";
       shell = pkgs.zsh;
       description = "Nora";
-      extraGroups = [ "networkmanager" "wheel" ];
+      extraGroups = [ "networkmanager" "wheel" "podman" ];
       packages = with pkgs; [
       ];
       group = "nora";

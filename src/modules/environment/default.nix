@@ -18,7 +18,6 @@ in
     };
 
     systemPackages =
-<<<<<<< HEAD
       (with pkgs; [
         # basics
         neofetch

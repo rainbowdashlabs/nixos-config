@@ -1,14 +1,27 @@
+OLD=$1
+NEW=$2
+
+echo "About to change username from '$OLD' to '$NEW'"
+read -p "Is this correct? (y/N) " confirm
+
+if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+    echo "Operation cancelled"
+    exit 1
+fi
+
 subgid=$(< /etc/subgid)
 subuid=$(< /etc/subuid)
 
-usermod -l $2 -d /home/$2 -m $1
-groupmod -n $2 $1
+usermod -l $NEW -d /home/$OLD -m $NEW
+groupmod -n $NEW $OLD
 passwd $2
-sed -i -e "s/$1/$2/g" /var/lib/nixos/gid-map
-sed -i -e "s/$1/$2/g" /var/lib/nixos/uid-map
+sed -i -e "s/$OLD/$NEW/g" /var/lib/nixos/gid-map
+sed -i -e "s/$OLD/$NEW/g" /var/lib/nixos/uid-map
 
-subgid=${subgid//"$1"/"$2"}
-subuid=${subuid//"$1"/"$2"}
+subgid=${subgid//"$OLD"/"$NEW"}
+subuid=${subuid//"$OLD"/"$NEW"}
 
 printf '%s' "$subgid" > /etc/subgid
 printf '%s' "$subuid" > /etc/subuid
+
+echo "Username successfully changed from $OLD to $NEW"

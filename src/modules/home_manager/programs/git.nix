@@ -9,10 +9,13 @@
       signByDefault = true;
     };
 
-    userName = "Nora";
-    userEmail = "46890129+RainbowDashLabs@users.noreply.github.com";
 
-    extraConfig = {
+    settings = {
+      user = {
+        name = "Nora";
+        email = "46890129+RainbowDashLabs@users.noreply.github.com";
+      };
+
       core = {
         editor = "nano";
         autocrlf = "input";
@@ -35,5 +38,15 @@
         defaultbranch = "main";
       };
     };
+
+    includes = [
+      {
+        condition = "gitdir:~/dev/work/";
+        contents.user = {
+          email = (builtins.readFile /etc/nixos/assets/git/work/mail);
+          name = (builtins.readFile /etc/nixos/assets/git/work/name);
+        };
+      }
+    ];
   };
 }

@@ -25,6 +25,7 @@ in
         fastfetch
         kdePackages.yakuake # terminal
         kdePackages.kcalc
+        btop
         # cli tools
         bash
         less
@@ -57,7 +58,7 @@ in
         vlc
         blender
         #libreoffice
-        onlyoffice-bin
+        onlyoffice-desktopeditors
         nextcloud-client
         # games
         prismlauncher
@@ -89,14 +90,13 @@ in
             "--enable-zero-copy"
           ];
         }) # enables drm protected content
-        whatsapp-for-linux
         anydesk
       ]) ++
       (with unstablePkgs; [
-        (jetbrains.idea-ultimate.override { vmopts = "-Dawt.toolkit.name=WLToolkit";})
-        (jetbrains.datagrip.override { vmopts = "-Dawt.toolkit.name=WLToolkit";})
-        (jetbrains.webstorm.override { vmopts = "-Dawt.toolkit.name=WLToolkit";})
-        (jetbrains.pycharm-professional.override { vmopts = "-Dawt.toolkit.name=WLToolkit";})
+        (jetbrains.idea-ultimate.override { forceWayland = true;})
+        (jetbrains.datagrip.override { forceWayland = true; })
+        (jetbrains.webstorm.override { forceWayland = true; })
+        (jetbrains.pycharm-professional.override { forceWayland = true;})
         discord
         # emulation
         wineWowPackages.stable

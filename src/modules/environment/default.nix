@@ -93,10 +93,10 @@ in
         anydesk
       ]) ++
       (with unstablePkgs; [
-        (jetbrains.idea-ultimate.override { forceWayland = true;})
+        (jetbrains.idea.override { forceWayland = true;})
         (jetbrains.datagrip.override { forceWayland = true; })
         (jetbrains.webstorm.override { forceWayland = true; })
-        (jetbrains.pycharm-professional.override { forceWayland = true;})
+        (jetbrains.pycharm.override { forceWayland = true;})
         discord
         # emulation
         wineWowPackages.stable

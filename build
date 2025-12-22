@@ -1,0 +1,65 @@
+#!/bin/sh
+
+if [ "$(id -u)" -ne 0 ]; then
+    echo "This script must be run as root (use sudo)"
+    exit 1
+fi
+
+update_channels() {
+    VERSION=$(cat nixos-version)
+    echo "Updating nix-channels to version $VERSION..."
+    nix-channel --add https://nixos.org/channels/nixos-unstable nixos-unstable
+    nix-channel --add "https://channels.nixos.org/nixos-$VERSION" nixos
+    nix-channel --add "https://github.com/nix-community/home-manager/archive/release-$VERSION.tar.gz" home-manager
+    nix-channel --add https://github.com/NixOS/nixos-hardware/archive/master.tar.gz nixos-hardware
+    nix-channel --update
+}
+
+echo "Copying assets..."
+mkdir -p /etc/nixos/assets
+cp ./nix-assets/* /etc/nixos/assets -r
+
+COMMAND=$1
+shift
+
+SKIP_CHANNEL=false
+SKIP_UPGRADE=false
+HOST=$(hostname)
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --skip-channel) SKIP_CHANNEL=true ;;
+        --skip-upgrade) SKIP_UPGRADE=true ;;
+        *) HOST=$1 ;;
+    esac
+    shift
+done
+
+case "$COMMAND" in
+    rebuild)
+        if [ "$SKIP_CHANNEL" = false ]; then
+            nix-channel --update
+        fi
+
+        UPGRADE_FLAG="--upgrade"
+        if [ "$SKIP_UPGRADE" = true ]; then
+            UPGRADE_FLAG=""
+        fi
+
+        echo "Rebuilding (switch) for host: $HOST"
+        nixos-rebuild switch -I nixos-config="$(pwd)/src/hosts/$HOST.nix" $UPGRADE_FLAG
+        ;;
+    upgrade)
+        update_channels
+        echo "Upgrading (boot) for host: $HOST"
+        nixos-rebuild boot -I nixos-config="$(pwd)/src/hosts/$HOST.nix" --upgrade
+        ;;
+    *)
+        echo "Usage: sudo $0 {rebuild|upgrade} [hostname] [--skip-channel] [--skip-upgrade]"
+        echo "  rebuild: Runs nixos-rebuild switch"
+        echo "  upgrade: Updates channels and runs nixos-rebuild boot --upgrade"
+        echo "  --skip-channel: Skip 'nix-channel --update' during rebuild"
+        echo "  --skip-upgrade: Skip '--upgrade' flag during rebuild"
+        exit 1
+        ;;
+esac

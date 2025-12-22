@@ -12,7 +12,7 @@ fi
 subgid=$(< /etc/subgid)
 subuid=$(< /etc/subuid)
 
-usermod -l $NEW -d /home/$OLD -m $NEW
+usermod -l $NEW -d /home/$NEW -m $OLD
 groupmod -n $NEW $OLD
 passwd $2
 sed -i -e "s/$OLD/$NEW/g" /var/lib/nixos/gid-map

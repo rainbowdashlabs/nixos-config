@@ -5,7 +5,7 @@
     [
       ./bluetooth.nix
       ./audio.nix
-      ./podman.nix
+      ./docker.nix
       ./virt_manager.nix
       ./security.nix
       ./networking.nix

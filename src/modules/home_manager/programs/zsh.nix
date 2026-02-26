@@ -43,6 +43,10 @@
       ];
       theme = "robbyrussell";
     };
-    initContent = "export GPG_TTY=$(tty)\ngpg-connect-agent updatestartuptts /bye >/dev/null";
+    initContent = ''
+    export GPG_TTY=$(tty)
+    gpg-connect-agent updatestartuptts /bye >/dev/null
+    PIPENV_VENV_IN_PROJECT=true
+    '';
   };
 }

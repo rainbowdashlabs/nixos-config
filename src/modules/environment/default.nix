@@ -38,11 +38,9 @@ in
         docker-compose
         libgcc
         wireguard-tools
-        wgnord
         pipenv
         poetry
         git-lfs
-        jujutsu
         gh
         # communication
         thunderbird

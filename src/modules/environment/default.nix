@@ -97,10 +97,10 @@ in
         (jetbrains.pycharm.override { forceWayland = true;})
         discord
         # emulation
-        wineWowPackages.stable
-        winetricks
-        wineWowPackages.waylandFull
-        corefonts
+        ##wineWowPackages.stable
+        #winetricks
+        #wineWowPackages.waylandFull
+        #corefonts
       ]);
     pathsToLink = [ "/share/zsh" ];
 

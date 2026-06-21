@@ -20,8 +20,6 @@ in
     systemPackages =
       (with pkgs; [
         # basics
-        neofetch
-        uwuify
         fastfetch
         kdePackages.yakuake # terminal
         kdePackages.kcalc
@@ -41,6 +39,7 @@ in
         pipenv
         poetry
         git-lfs
+        lazygit
         gh
         # communication
         thunderbird
@@ -96,6 +95,7 @@ in
         (jetbrains.webstorm.override { forceWayland = true; })
         (jetbrains.pycharm.override { forceWayland = true;})
         discord
+        claude-code
         # emulation
         ##wineWowPackages.stable
         #winetricks

@@ -2,6 +2,84 @@
 
 let
   unstablePkgs = import <nixos-unstable> { config.allowUnfree = true; };
+
+  # JetBrains UI fix: run the IDEs on JBR 25 (JCEF) with system fontconfig.
+  # Ported from https://github.com/TheZexquex/NixConfig (jbrFixOverlay).
+  jetbrainsJdkPatched = unstablePkgs.stdenv.mkDerivation rec {
+    pname = "jetbrains-jdk-bin";
+    version = "25.0.3-linux-x64-b329.124";
+
+    src = unstablePkgs.fetchurl {
+      url = "https://cache-redirector.jetbrains.com/intellij-jbr/jbr_jcef-${version}.tar.gz";
+      hash = "sha256-0qUPSN+zV39BTp/A7OgOIEhs6hewqZwXxZUXXzE053U=";
+    };
+
+    nativeBuildInputs = with unstablePkgs; [
+      autoPatchelfHook
+      makeWrapper
+    ];
+
+    buildInputs = with unstablePkgs; [
+      libx11
+      libxext
+      libxrender
+      libxtst
+      libglvnd
+      alsa-lib
+      fontconfig
+      freetype
+      glib
+      zlib
+      libXcomposite
+      libXdamage
+      libXfixes
+      libXrandr
+      libXcursor
+      nss
+      nspr
+      dbus
+      atk
+      at-spi2-atk
+      cups
+      pango
+      cairo
+      libdrm
+      libxkbcommon
+      wayland
+      mesa
+    ];
+
+    runtimeDependencies = with unstablePkgs; [
+      udev
+    ];
+
+    dontConfigure = true;
+    dontBuild = true;
+
+    installPhase = ''
+      mkdir -p $out
+      cp -r * $out/
+    '';
+  };
+
+  # envVarPrefix must match the IDE's launcher variable (IDEA_JDK, PYCHARM_JDK, ...)
+  jbUiFix = envVarPrefix: ide:
+    unstablePkgs.symlinkJoin {
+      name = "${ide.name}-jbr25-patched";
+      paths = [ ide ];
+      nativeBuildInputs = [ unstablePkgs.makeWrapper ];
+      postBuild = ''
+        for exe in $out/bin/*; do
+          if [ -e "$exe" ]; then
+            wrapProgram "$exe" \
+              --set ${envVarPrefix}_JDK "${jetbrainsJdkPatched}" \
+              --set FONTCONFIG_FILE "/etc/fonts/fonts.conf" \
+              --set FONTCONFIG_PATH "/etc/fonts" \
+              --prefix LD_LIBRARY_PATH : "${unstablePkgs.lib.makeLibraryPath (with unstablePkgs; [ fontconfig freetype ])}"
+          fi
+        done
+      '';
+    };
 in
 {
   imports = [ ];
@@ -90,10 +168,10 @@ in
         anydesk
       ]) ++
       (with unstablePkgs; [
-        (jetbrains.idea.override { forceWayland = true;})
-        (jetbrains.datagrip.override { forceWayland = true; })
-        (jetbrains.webstorm.override { forceWayland = true; })
-        (jetbrains.pycharm.override { forceWayland = true;})
+        (jbUiFix "IDEA" jetbrains.idea)
+        (jbUiFix "DATAGRIP" jetbrains.datagrip)
+        (jbUiFix "WEBSTORM" jetbrains.webstorm)
+        (jbUiFix "PYCHARM" jetbrains.pycharm)
         discord
         claude-code
         # emulation

@@ -13,9 +13,18 @@ in
       ];
     };
 
+    # The CLI has to come from this module rather than environment.systemPackages. It installs op
+    # behind a setgid wrapper at /run/wrappers/bin/op, and the desktop app verifies the calling
+    # binary before it will talk to it — an unwrapped op is refused with "connecting to desktop
+    # app: read: connection reset", which reads as though the integration setting were off.
+    _1password.enable = true;
+
     _1password-gui = {
       enable = true;
-      polkitPolicyOwners = [ "lilly" ];
+      # Was "lilly", who does not exist on this system or anywhere in this configuration — left
+      # behind by the username migration. The owner has to be a real user or nothing is added to
+      # the onepassword group.
+      polkitPolicyOwners = [ "nora" ];
       package = unstablePkgs._1password-gui;
     };
     zsh = {

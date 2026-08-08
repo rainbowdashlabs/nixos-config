@@ -7,5 +7,6 @@
     # ./nextcloud.nix
     ./misc.nix
     ./audio.nix
+    ./mymcp.nix
   ];
 }

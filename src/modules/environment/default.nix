@@ -119,6 +119,7 @@ in
         git-lfs
         lazygit
         gh
+        jq
         # communication
         thunderbird
         discord-ptb

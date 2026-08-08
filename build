@@ -5,6 +5,12 @@ if [ "$(id -u)" -ne 0 ]; then
     exit 1
 fi
 
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+LOG_DIR="$SCRIPT_DIR/logs"
+mkdir -p "$LOG_DIR"
+LOG_FILE="$LOG_DIR/build-$(date +%Y%m%d-%H%M%S).log"
+echo "Logging to $LOG_FILE"
+
 update_channels() {
     VERSION=$(cat nixos-version)
     echo "Updating nix-channels to version $VERSION..."
@@ -15,6 +21,36 @@ update_channels() {
     nix-channel --update
 }
 
+update_submodules() {
+    echo "Updating submodules..."
+    # --recursive, not just --init: nix-assets has submodules of its own, and a plain --init
+    # leaves those as empty directories that only fail much later, during evaluation, with a
+    # path error that says nothing about submodules.
+    #
+    # Run as the invoking user rather than root. Git refuses to work in a repository owned by
+    # somebody else, and forcing it past that would leave root-owned objects behind in .git
+    # that break every later git command from a normal shell.
+    if [ -n "$SUDO_USER" ]; then
+        sudo -u "$SUDO_USER" git -C "$SCRIPT_DIR" submodule update --init --recursive
+    else
+        git -C "$SCRIPT_DIR" submodule update --init --recursive
+    fi
+}
+
+update_hardware_config() {
+    if [ "$HOST" = "$(hostname)" ]; then
+        HW_FILE="./src/hosts/hardware/$HOST.nix"
+        echo "Regenerating hardware config: $HW_FILE"
+        nixos-generate-config --show-hardware-config > "$HW_FILE"
+    else
+        echo "Skipping hardware config update (target host '$HOST' != current host '$(hostname)')"
+    fi
+}
+
+{
+
+update_submodules
+
 echo "Copying assets..."
 mkdir -p /etc/nixos/assets
 cp ./nix-assets/* /etc/nixos/assets -r
@@ -24,12 +60,14 @@ shift
 
 SKIP_CHANNEL=false
 SKIP_UPGRADE=false
+SKIP_HARDWARE=false
 HOST=$(hostname)
 
 while [ $# -gt 0 ]; do
     case "$1" in
         --skip-channel) SKIP_CHANNEL=true ;;
         --skip-upgrade) SKIP_UPGRADE=true ;;
+        --skip-hardware) SKIP_HARDWARE=true ;;
         *) HOST=$1 ;;
     esac
     shift
@@ -39,6 +77,10 @@ case "$COMMAND" in
     rebuild)
         if [ "$SKIP_CHANNEL" = false ]; then
             nix-channel --update
+        fi
+
+        if [ "$SKIP_HARDWARE" = false ]; then
+            update_hardware_config
         fi
 
         UPGRADE_FLAG="--upgrade"
@@ -51,15 +93,23 @@ case "$COMMAND" in
         ;;
     upgrade)
         update_channels
+        if [ "$SKIP_HARDWARE" = false ]; then
+            update_hardware_config
+        fi
         echo "Upgrading (boot) for host: $HOST"
         nixos-rebuild boot -I nixos-config="$(pwd)/src/hosts/$HOST.nix" --upgrade
         ;;
     *)
-        echo "Usage: sudo $0 {rebuild|upgrade} [hostname] [--skip-channel] [--skip-upgrade]"
+        echo "Usage: sudo $0 {rebuild|upgrade} [hostname] [--skip-channel] [--skip-upgrade] [--skip-hardware]"
         echo "  rebuild: Runs nixos-rebuild switch"
         echo "  upgrade: Updates channels and runs nixos-rebuild boot --upgrade"
         echo "  --skip-channel: Skip 'nix-channel --update' during rebuild"
         echo "  --skip-upgrade: Skip '--upgrade' flag during rebuild"
+        echo "  --skip-hardware: Skip regenerating src/hosts/hardware/<host>.nix"
         exit 1
         ;;
 esac
+
+} 2>&1 | while IFS= read -r line; do
+    printf '[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$line"
+done | tee -a "$LOG_FILE"

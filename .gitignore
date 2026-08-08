@@ -31,3 +31,4 @@ bin/
 *.iml
 /.idea
 /.jj
+/logs

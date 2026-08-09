@@ -21,19 +21,56 @@ update_channels() {
     nix-channel --update
 }
 
+# Git, as the invoking user rather than as root. Git refuses to work in a repository owned by
+# somebody else, and forcing it past that would leave root-owned objects behind in .git that break
+# every later git command from a normal shell.
+as_user_git() {
+    if [ -n "$SUDO_USER" ]; then
+        sudo -u "$SUDO_USER" git -C "$SCRIPT_DIR" "$@"
+    else
+        git -C "$SCRIPT_DIR" "$@"
+    fi
+}
+
 update_submodules() {
     echo "Updating submodules..."
     # --recursive, not just --init: nix-assets has submodules of its own, and a plain --init
     # leaves those as empty directories that only fail much later, during evaluation, with a
     # path error that says nothing about submodules.
     #
-    # Run as the invoking user rather than root. Git refuses to work in a repository owned by
-    # somebody else, and forcing it past that would leave root-owned objects behind in .git
-    # that break every later git command from a normal shell.
-    if [ -n "$SUDO_USER" ]; then
-        sudo -u "$SUDO_USER" git -C "$SCRIPT_DIR" submodule update --init --recursive
-    else
-        git -C "$SCRIPT_DIR" submodule update --init --recursive
+    # --remote, and the checkout below: `submodule update` on its own checks out the exact commit
+    # the superproject records and leaves HEAD detached, because a submodule is pinned to a commit
+    # and not to a branch. That is right for a third-party dependency and wrong for these, which
+    # are repositories we develop in — every rebuild quietly moved the checkout off `main` and back
+    # onto whatever was pinned, so the next commit made there started from a detached HEAD several
+    # commits behind, and the work already pushed looked as though it had vanished.
+    as_user_git submodule update --init --recursive --remote
+
+    # `--remote` fetches the branch and moves to its tip, still detached. This is what puts HEAD
+    # back on the branch itself. Nothing is forced: a submodule with uncommitted work is left
+    # exactly as it is and says so.
+    as_user_git submodule foreach --recursive '
+        branch=$(git config -f "$toplevel/.gitmodules" "submodule.$name.branch" 2>/dev/null || true)
+        [ -n "$branch" ] || branch=main
+        if ! git diff --quiet HEAD 2>/dev/null; then
+            echo "  $displaypath: uncommitted changes, left detached"
+        elif git checkout -q "$branch" 2>/dev/null; then
+            git merge --ff-only -q "origin/$branch" 2>/dev/null || true
+        else
+            echo "  $displaypath: no branch '"'"'$branch'"'"', left detached"
+        fi
+    '
+
+    # A submodule now tracking its branch can sit ahead of the commit the superproject records.
+    # Said out loud rather than left to be noticed: the build uses what is checked out, so this is
+    # the difference between what is being built and what the repository claims is being built.
+    # `submodule status` marks a submodule whose checkout differs from the recorded commit with a
+    # leading '+'. Asked this way rather than as a diff, which would also list every unrelated file
+    # edited in the working tree and bury the one thing this is about.
+    moved=$(as_user_git submodule status --recursive | sed -n 's/^+[0-9a-f]* \([^ ]*\).*/  \1/p')
+    if [ -n "$moved" ]; then
+        echo "Submodules moved ahead of what nixos-config records — commit the gitlink to pin it:"
+        echo "$moved"
     fi
 }
 

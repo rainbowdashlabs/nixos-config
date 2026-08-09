@@ -1,3 +1,4 @@
 [submodule "nix-assets"]
     path = nix-assets
 	url = ../nix-assets.git
+	branch = main

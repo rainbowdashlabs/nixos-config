@@ -12,5 +12,7 @@
 
   networking.hostName = "liara";
 
+  environment.systemPackages = [ pkgs.ultrastardx ];
+
   system.stateVersion = "23.11";
 }

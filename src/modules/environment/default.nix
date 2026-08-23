@@ -139,7 +139,7 @@ in
         # games
         prismlauncher
         lutris
-        steam
+        # steam # installed via programs.steam (see modules/programs/steam.nix)
         protonup-qt
         # tooling
         clinfo

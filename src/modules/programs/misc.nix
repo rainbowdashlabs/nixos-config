@@ -49,6 +49,15 @@ in
       enable = true;
       enableSSHSupport = true;
       # pinentryFlavour = "gtk2";
+      settings = {
+        # Keep an unlocked key cached for 12 hours, refreshed on each use.
+        # max-cache-ttl caps the total lifetime, so it has to be raised too --
+        # otherwise gpg-agent's 2h default would expire the key regardless.
+        default-cache-ttl = 43200;
+        max-cache-ttl = 43200;
+        default-cache-ttl-ssh = 43200;
+        max-cache-ttl-ssh = 43200;
+      };
     };
     dconf.enable = true;
     nix-ld = {

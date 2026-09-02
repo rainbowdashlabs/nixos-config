@@ -22,6 +22,10 @@
 #    };
 #  });
 
+  environment.systemPackages = [
+    citrixPkgs.citrix_workspace
+  ];
+
 
   system.stateVersion = "23.11";
 }

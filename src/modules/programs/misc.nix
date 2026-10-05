@@ -1,6 +1,10 @@
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 let
-  unstablePkgs = import <nixos-unstable> { config.allowUnfree = true; config.cudaSupport = true; };
+  unstablePkgs = import inputs.nixpkgs-unstable {
+    inherit (pkgs.stdenv.hostPlatform) system;
+    config.allowUnfree = true;
+    config.cudaSupport = true;
+  };
 in
 {
   programs = {

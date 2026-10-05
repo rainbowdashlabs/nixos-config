@@ -9,7 +9,8 @@
       ./virt_manager.nix
       ./security.nix
       ./networking.nix
-      ./logitech.nix
+      ./openlogi.nix
+      ./flakes.nix
     ];
 
 }

@@ -8,7 +8,7 @@
     stateVersion = "23.11";
 
     file.".ssh/config" = {
-        source = "/etc/nixos/assets/ssh/config";
+        source = ../../../../nix-assets/ssh/config;
         force = true;
     };
   };

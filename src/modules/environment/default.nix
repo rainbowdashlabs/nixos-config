@@ -1,7 +1,10 @@
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
 let
-  unstablePkgs = import <nixos-unstable> { config.allowUnfree = true; };
+  unstablePkgs = import inputs.nixpkgs-unstable {
+    inherit (pkgs.stdenv.hostPlatform) system;
+    config.allowUnfree = true;
+  };
 
   # JetBrains UI fix: run the IDEs on JBR 25 (JCEF) with system fontconfig.
   # Ported from https://github.com/TheZexquex/NixConfig (jbrFixOverlay).

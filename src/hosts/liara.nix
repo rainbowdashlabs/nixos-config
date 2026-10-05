@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, inputs, ... }:
 
 let
   # Citrix Workspace is unfree, and it links against libsoup 2.x, which nixpkgs marks insecure.
@@ -14,7 +14,8 @@ let
   #
   # after downloading the 64-bit .tar.gz from
   # https://www.citrix.com/downloads/workspace-app/linux/workspace-app-for-linux-latest.html
-  citrixPkgs = import <nixpkgs> {
+  citrixPkgs = import inputs.nixpkgs {
+    inherit (pkgs.stdenv.hostPlatform) system;
     config = {
       allowUnfree = true;
       allowInsecurePredicate = pkg: lib.getName pkg == "libsoup";
@@ -26,7 +27,7 @@ in
     [ # Include the results of the hosts.hardware scan.
       ./hardware/liara.nix
       ./../modules
-      <nixos-hardware/framework/16-inch/7040-amd>
+      inputs.nixos-hardware.nixosModules.framework-16-7040-amd
     ];
 
   services.fwupd.enable = true;

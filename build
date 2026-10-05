@@ -11,15 +11,7 @@ mkdir -p "$LOG_DIR"
 LOG_FILE="$LOG_DIR/build-$(date +%Y%m%d-%H%M%S).log"
 echo "Logging to $LOG_FILE"
 
-update_channels() {
-    VERSION=$(cat nixos-version)
-    echo "Updating nix-channels to version $VERSION..."
-    nix-channel --add https://nixos.org/channels/nixos-unstable nixos-unstable
-    nix-channel --add "https://channels.nixos.org/nixos-$VERSION" nixos
-    nix-channel --add "https://github.com/nix-community/home-manager/archive/release-$VERSION.tar.gz" home-manager
-    nix-channel --add https://github.com/NixOS/nixos-hardware/archive/master.tar.gz nixos-hardware
-    nix-channel --update
-}
+export NIX_CONFIG="experimental-features = nix-command flakes"
 
 # Git, as the invoking user rather than as root. Git refuses to work in a repository owned by
 # somebody else, and forcing it past that would leave root-owned objects behind in .git that break
@@ -74,6 +66,16 @@ update_submodules() {
     fi
 }
 
+# As the invoking user, for the same reason as git: flake.lock must not end up owned by root.
+update_inputs() {
+    echo "Updating flake inputs..."
+    if [ -n "$SUDO_USER" ]; then
+        sudo -u "$SUDO_USER" env NIX_CONFIG="$NIX_CONFIG" nix flake update --flake "$SCRIPT_DIR"
+    else
+        nix flake update --flake "$SCRIPT_DIR"
+    fi
+}
+
 update_hardware_config() {
     if [ "$HOST" = "$(hostname)" ]; then
         HW_FILE="./src/hosts/hardware/$HOST.nix"
@@ -95,15 +97,13 @@ cp ./nix-assets/* /etc/nixos/assets -r
 COMMAND=$1
 shift
 
-SKIP_CHANNEL=false
-SKIP_UPGRADE=false
+UPDATE=false
 SKIP_HARDWARE=false
 HOST=$(hostname)
 
 while [ $# -gt 0 ]; do
     case "$1" in
-        --skip-channel) SKIP_CHANNEL=true ;;
-        --skip-upgrade) SKIP_UPGRADE=true ;;
+        --update) UPDATE=true ;;
         --skip-hardware) SKIP_HARDWARE=true ;;
         *) HOST=$1 ;;
     esac
@@ -112,37 +112,32 @@ done
 
 case "$COMMAND" in
     rebuild)
-        if [ "$SKIP_CHANNEL" = false ]; then
-            nix-channel --update
+        if [ "$UPDATE" = true ]; then
+            update_inputs
         fi
 
         if [ "$SKIP_HARDWARE" = false ]; then
             update_hardware_config
         fi
 
-        UPGRADE_FLAG="--upgrade"
-        if [ "$SKIP_UPGRADE" = true ]; then
-            UPGRADE_FLAG=""
-        fi
-
         echo "Rebuilding (switch) for host: $HOST"
-        nixos-rebuild switch -I nixos-config="$(pwd)/src/hosts/$HOST.nix" $UPGRADE_FLAG
+        nixos-rebuild switch --flake "$SCRIPT_DIR#$HOST"
         ;;
     upgrade)
-        update_channels
+        update_inputs
         if [ "$SKIP_HARDWARE" = false ]; then
             update_hardware_config
         fi
         echo "Upgrading (boot) for host: $HOST"
-        nixos-rebuild boot -I nixos-config="$(pwd)/src/hosts/$HOST.nix" --upgrade
+        nixos-rebuild boot --flake "$SCRIPT_DIR#$HOST"
         ;;
     *)
-        echo "Usage: sudo $0 {rebuild|upgrade} [hostname] [--skip-channel] [--skip-upgrade] [--skip-hardware]"
-        echo "  rebuild: Runs nixos-rebuild switch"
-        echo "  upgrade: Updates channels and runs nixos-rebuild boot --upgrade"
-        echo "  --skip-channel: Skip 'nix-channel --update' during rebuild"
-        echo "  --skip-upgrade: Skip '--upgrade' flag during rebuild"
+        echo "Usage: sudo $0 {rebuild|upgrade} [hostname] [--update] [--skip-hardware]"
+        echo "  rebuild: Runs nixos-rebuild switch with the locked inputs"
+        echo "  upgrade: Updates flake.lock and runs nixos-rebuild boot"
+        echo "  --update: Update flake.lock before a rebuild"
         echo "  --skip-hardware: Skip regenerating src/hosts/hardware/<host>.nix"
+        echo "The NixOS release is set by the nixpkgs and home-manager refs in flake.nix."
         exit 1
         ;;
 esac

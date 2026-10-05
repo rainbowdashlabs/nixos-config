@@ -32,3 +32,5 @@ bin/
 /.idea
 /.jj
 /logs
+/.concept
+/result

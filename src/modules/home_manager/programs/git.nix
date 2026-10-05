@@ -51,8 +51,8 @@
         condition = "gitdir:~/dev/work/";
         contents = {
           user = {
-            email = (builtins.readFile /etc/nixos/assets/git/work/mail);
-            name = (builtins.readFile /etc/nixos/assets/git/work/name);
+            email = (builtins.readFile ../../../../nix-assets/git/work/mail);
+            name = (builtins.readFile ../../../../nix-assets/git/work/name);
           };
         };
       }

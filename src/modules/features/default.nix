@@ -11,6 +11,7 @@
       ./networking.nix
       ./openlogi.nix
       ./flakes.nix
+      ./vpn.nix
     ];
 
 }

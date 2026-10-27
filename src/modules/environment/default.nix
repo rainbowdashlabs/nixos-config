@@ -123,6 +123,7 @@ in
         lazygit
         gh
         jq
+        unzip
         # communication
         thunderbird
         discord-ptb
@@ -131,7 +132,7 @@ in
         signal-desktop
         # media
         spotify
-        youtube-music
+        pear-desktop
         flameshot
         mpv
         vlc
@@ -142,6 +143,7 @@ in
         # games
         prismlauncher
         lutris
+        (retroarch.withCores (cores: with cores; [ desmume melondsds ]))
         # steam # installed via programs.steam (see modules/programs/steam.nix)
         protonup-qt
         # tooling

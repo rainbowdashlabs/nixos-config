@@ -40,7 +40,8 @@
 
       alias = {
         cb = "!git fetch -p && for branch in $(git for-each-ref --format '\''%(refname) %(upstream:track)'\'' refs/heads | awk '\''$2 == \"[gone]\" {sub(\"refs/heads/\", \"\", $1); print $1}'\''); do git branch -D $branch; done";
-        trigger = "!git commit -m \"Trigger\" --allow-empty";
+        cleanup = "!f() { git fetch -p || return; base=$(git symbolic-ref -q --short refs/remotes/origin/HEAD || echo origin/main); current=$(git branch --show-current); git for-each-ref --format='%(refname:short)|%(upstream:short)|%(upstream:track)' refs/heads | while IFS='|' read -r branch upstream track; do [ -z \"$upstream\" ] || [ \"$branch\" = \"$current\" ] || [ \"$branch\" = \"\${base#origin/}\" ] && continue; if [ \"$track\" = \"[gone]\" ] || git merge-base --is-ancestor \"$branch\" \"$base\"; then git branch -D \"$branch\"; fi; done; }; f";
+        trigger ="!git commit -m \"Trigger\" --allow-empty";
         pfusch = "!git push --force-with-lease";
         cc = "!f(){ br=$(git rev-parse --abbrev-ref HEAD); msg=\"$*\"; case \"$br\" in feature/*) key=\${br#feature/}; key=\${key%%/*}; msg=\"$key $msg\";; esac; git commit -m \"$msg\"; }; f";
       };

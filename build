@@ -13,15 +13,22 @@ echo "Logging to $LOG_FILE"
 
 export NIX_CONFIG="experimental-features = nix-command flakes"
 
+# Anything that needs the invoking user's credentials or must not leave root-owned files behind
+# runs as the invoking user rather than as root: git (see as_user_git), and every Nix command that
+# touches flake.lock or fetches sources.
+as_user() {
+    if [ -n "$SUDO_USER" ]; then
+        sudo -u "$SUDO_USER" env NIX_CONFIG="$NIX_CONFIG" "$@"
+    else
+        "$@"
+    fi
+}
+
 # Git, as the invoking user rather than as root. Git refuses to work in a repository owned by
 # somebody else, and forcing it past that would leave root-owned objects behind in .git that break
 # every later git command from a normal shell.
 as_user_git() {
-    if [ -n "$SUDO_USER" ]; then
-        sudo -u "$SUDO_USER" git -C "$SCRIPT_DIR" "$@"
-    else
-        git -C "$SCRIPT_DIR" "$@"
-    fi
+    as_user git -C "$SCRIPT_DIR" "$@"
 }
 
 update_submodules() {
@@ -69,11 +76,29 @@ update_submodules() {
 # As the invoking user, for the same reason as git: flake.lock must not end up owned by root.
 update_inputs() {
     echo "Updating flake inputs..."
-    if [ -n "$SUDO_USER" ]; then
-        sudo -u "$SUDO_USER" env NIX_CONFIG="$NIX_CONFIG" nix flake update --flake "$SCRIPT_DIR"
-    else
-        nix flake update --flake "$SCRIPT_DIR"
-    fi
+    as_user nix flake update --flake "$SCRIPT_DIR"
+}
+
+# Copies the flake source into the Nix store as the invoking user and prints the store path, so
+# that nixos-rebuild can be pointed at the copy instead of at the git checkout.
+#
+# Pointing nixos-rebuild at the checkout directly fails as root whenever the working tree is clean.
+# flake.nix sets `self.submodules = true`, and with a clean tree Nix does not read the submodules
+# from the checkout: it fetches the superproject by commit and then fetches each submodule from the
+# URL in .gitmodules, which resolves to git@github.com. That happens as whoever runs Nix, and root
+# has no GitHub key, so the rebuild dies with "Permission denied (publickey)" before evaluating
+# anything. A dirty tree takes a different path through Nix, straight from the working tree, which
+# is why the same rebuild worked for as long as something happened to be modified.
+#
+# Fetched as the invoking user it works both ways, and root then evaluates a plain store path:
+# no git, no SSH, nothing to fetch for `self`. The inputs are locked by hash in flake.lock and
+# resolve from the store when already present.
+#
+# `nix flake lock` first: `metadata` would write a missing lock entry to the checkout but hand back
+# a copy made before it did so. Both are no-ops when flake.lock is complete.
+flake_source() {
+    as_user nix flake lock "$SCRIPT_DIR" >&2 || return 1
+    as_user nix flake metadata --json "$SCRIPT_DIR" | jq -er .path
 }
 
 update_hardware_config() {
@@ -86,62 +111,85 @@ update_hardware_config() {
     fi
 }
 
-{
+# Everything after the submodules and the hardware config is settled: the flake source has to be
+# copied after both, or the rebuild would see the state from before.
+rebuild() {
+    action=$1
+    echo "Preparing flake source..."
+    SRC=$(flake_source) || { echo "Failed to prepare the flake source, not rebuilding."; return 1; }
+    echo "Flake source: $SRC"
+    echo "Running nixos-rebuild $action for host: $HOST"
+    nixos-rebuild "$action" --flake "$SRC#$HOST"
+}
 
-update_submodules
+usage() {
+    echo "Usage: sudo $0 {rebuild|upgrade} [hostname] [--update] [--skip-hardware]"
+    echo "  rebuild: Runs nixos-rebuild switch with the locked inputs"
+    echo "  upgrade: Updates flake.lock and runs nixos-rebuild boot"
+    echo "  --update: Update flake.lock before a rebuild"
+    echo "  --skip-hardware: Skip regenerating src/hosts/hardware/<host>.nix"
+    echo "The NixOS release is set by the nixpkgs and home-manager refs in flake.nix."
+}
 
-echo "Copying assets..."
-mkdir -p /etc/nixos/assets
-cp ./nix-assets/* /etc/nixos/assets -r
+main() {
+    COMMAND=${1:-}
+    [ $# -gt 0 ] && shift
 
-COMMAND=$1
-shift
+    UPDATE=false
+    SKIP_HARDWARE=false
+    HOST=$(hostname)
 
-UPDATE=false
-SKIP_HARDWARE=false
-HOST=$(hostname)
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --update) UPDATE=true ;;
+            --skip-hardware) SKIP_HARDWARE=true ;;
+            *) HOST=$1 ;;
+        esac
+        shift
+    done
 
-while [ $# -gt 0 ]; do
-    case "$1" in
-        --update) UPDATE=true ;;
-        --skip-hardware) SKIP_HARDWARE=true ;;
-        *) HOST=$1 ;;
+    case "$COMMAND" in
+        rebuild|upgrade) ;;
+        *) usage; return 1 ;;
     esac
-    shift
-done
 
-case "$COMMAND" in
-    rebuild)
-        if [ "$UPDATE" = true ]; then
-            update_inputs
-        fi
+    update_submodules
 
-        if [ "$SKIP_HARDWARE" = false ]; then
-            update_hardware_config
-        fi
+    echo "Copying assets..."
+    mkdir -p /etc/nixos/assets
+    cp ./nix-assets/* /etc/nixos/assets -r
 
-        echo "Rebuilding (switch) for host: $HOST"
-        nixos-rebuild switch --flake "$SCRIPT_DIR#$HOST"
-        ;;
-    upgrade)
+    # A fixed path to this checkout, wherever it was cloned on this machine. Home-manager links
+    # editable files out of the store into the checkout, and evaluation
+    # cannot know where the checkout lives, so it points at this link instead of a per-host path.
+    ln -sfn "$SCRIPT_DIR" /etc/nixos/checkout
+
+    if [ "$COMMAND" = upgrade ] || [ "$UPDATE" = true ]; then
         update_inputs
-        if [ "$SKIP_HARDWARE" = false ]; then
-            update_hardware_config
-        fi
-        echo "Upgrading (boot) for host: $HOST"
-        nixos-rebuild boot --flake "$SCRIPT_DIR#$HOST"
-        ;;
-    *)
-        echo "Usage: sudo $0 {rebuild|upgrade} [hostname] [--update] [--skip-hardware]"
-        echo "  rebuild: Runs nixos-rebuild switch with the locked inputs"
-        echo "  upgrade: Updates flake.lock and runs nixos-rebuild boot"
-        echo "  --update: Update flake.lock before a rebuild"
-        echo "  --skip-hardware: Skip regenerating src/hosts/hardware/<host>.nix"
-        echo "The NixOS release is set by the nixpkgs and home-manager refs in flake.nix."
-        exit 1
-        ;;
-esac
+    fi
 
+    if [ "$SKIP_HARDWARE" = false ]; then
+        update_hardware_config
+    fi
+
+    case "$COMMAND" in
+        rebuild) rebuild switch ;;
+        upgrade) rebuild boot ;;
+    esac
+}
+
+# The exit status has to survive the logging pipeline: plain sh has no pipefail, so without this the
+# script reported success after every failed rebuild, with the only sign of trouble buried in the
+# log. The status is handed out through a file because that is all that crosses a pipe in sh.
+STATUS_FILE=$(mktemp)
+trap 'rm -f "$STATUS_FILE"' EXIT
+
+{
+    main "$@"
+    echo $? > "$STATUS_FILE"
 } 2>&1 | while IFS= read -r line; do
     printf '[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$line"
 done | tee -a "$LOG_FILE"
+
+STATUS=$(cat "$STATUS_FILE" 2>/dev/null)
+exit "${STATUS:-1}"

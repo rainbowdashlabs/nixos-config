@@ -1,9 +1,10 @@
-{ config, ... }:
+{ ... }:
 
 {
   imports = [ ../../../../nix-assets/home.nix ];
 
-  assets.checkout = "${config.home.homeDirectory}/dev/nixos-config/nix-assets";
+  # Maintained by ./build, which links it to wherever this repository is checked out.
+  assets.checkout = "/etc/nixos/checkout/nix-assets";
 
   home = {
     username = "nora";

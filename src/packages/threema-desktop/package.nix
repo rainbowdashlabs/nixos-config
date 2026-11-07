@@ -118,7 +118,7 @@ in
       pnpm = pnpm_11;
       postPatch = relaxToolchainPins;
       fetcherVersion = 4;
-      hash = "sha256-iTipjUNU/U5eetZOPgJks0nJKN7YoWdY4jSQ69DuatU=";
+      hash = "sha256-rezqouN8aq4xDf1kgwlXsFNI8g5Fr54YW9Sa/bMJagc=";
     };
 
     nativeBuildInputs = [

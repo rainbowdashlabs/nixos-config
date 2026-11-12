@@ -32,6 +32,8 @@ in
 
   networking.hostName = "shepard";
 
+  services.displayManager.sddm.wayland.enable = false;
+
 #  boot.kernelPackages = pkgs.linuxPackagesFor (pkgs.linux_6_6.override {
 #    argsOverride = rec {
 #      src = pkgs.fetchurl {

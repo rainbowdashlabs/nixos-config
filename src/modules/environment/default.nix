@@ -171,7 +171,12 @@ in
             "--enable-zero-copy"
           ];
         }) # enables drm protected content
-        anydesk
+        (anydesk.overrideAttrs (old: {
+          src = fetchurl {
+            inherit (old.src) urls;
+            hash = "sha256-zS5P2eyTHZY7cBW8mQ2Q6M0lXcx9VZZTtpG3Bb6u7IQ=";
+          };
+        }))
       ]) ++
       (with unstablePkgs; [
         (jbUiFix "IDEA" jetbrains.idea)

@@ -17,6 +17,7 @@
       url = "github:AprilNEA/OpenLogi?dir=packaging";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+    affinity-nix.url = "github:mrshmllow/affinity-nix";
   };
 
   outputs =

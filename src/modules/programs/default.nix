@@ -3,6 +3,7 @@
 {
   imports =
     [
+      ./affinity.nix
       ./firefox.nix
       ./misc.nix
       ./steam.nix

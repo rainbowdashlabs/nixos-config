@@ -83,12 +83,6 @@ let
         done
       '';
     };
-  # TODO: drop once nixpkgs-unstable carries the hash of the re-uploaded IDEA 2026.3 tarball
-  ideaWithCurrentTarball = unstablePkgs.jetbrains.idea.overrideAttrs (old: {
-    src = old.src.overrideAttrs {
-      outputHash = "sha256-BRyhc5Hs5DkXnK4U/0dHb2k9UDzv+1ff052Sj0yP5ZA=";
-    };
-  });
 in
 {
   imports = [ ];
@@ -185,7 +179,7 @@ in
         }))
       ]) ++
       (with unstablePkgs; [
-        (jbUiFix "IDEA" ideaWithCurrentTarball)
+        (jbUiFix "IDEA" jetbrains.idea)
         (jbUiFix "DATAGRIP" jetbrains.datagrip)
         (jbUiFix "WEBSTORM" jetbrains.webstorm)
         (jbUiFix "PYCHARM" jetbrains.pycharm)
